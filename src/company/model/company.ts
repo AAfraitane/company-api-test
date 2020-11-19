@@ -6,16 +6,17 @@ export class CompanyDto {
 
     siren: number;
 
-    results: {
+    results: Array<Result>
+}
 
-        ca: number;
+class Result {
+    ca: number;
 
-        margin: number;
+    margin: number;
 
-        ebitda: number;
+    ebitda: number;
 
-        loss: number;
+    loss: number;
 
-        year: number; 
-    }
+    year: number; 
 }

@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { sort } from './company.controller';
 import { CompanyService } from './company.service';
 
 describe('CompanyService', () => {
@@ -17,7 +18,7 @@ describe('CompanyService', () => {
   });
 
   it('should getAll companies', () => {
-    const allCompanies = service.getAll();
+    const allCompanies = service.getAll(null);
     const expectedCompanies = require('../../resources/companies.json');
 
     expect(allCompanies).toBe(expectedCompanies);
@@ -48,9 +49,10 @@ describe('CompanyService', () => {
     };
     expect(JSON.stringify(company)).toBe(JSON.stringify(expectedCompany));
   });
+  
 
   it('should get companies by name', () => {
-    const companies = service.getCompanyByNameOrSector("Collins Group", null);
+    const companies = service.getCompanyByNameOrSector("Collins Group", null, null);
     expect(companies.length).toBe(2);
     companies.forEach((company) => {
       expect(company.name).toBe("Collins Group");
@@ -58,7 +60,7 @@ describe('CompanyService', () => {
   });
 
   it('should get companies by sector', () => {
-    const companies = service.getCompanyByNameOrSector(null, "Electronic");
+    const companies = service.getCompanyByNameOrSector(null, "Electronic", null);
     expect(companies.length).toBe(202);
     companies.forEach((company) => {
       expect(company.sector).toBe("Electronic");
@@ -66,11 +68,107 @@ describe('CompanyService', () => {
   });
 
   it('should get companies by sector and name', () => {
-    const companies = service.getCompanyByNameOrSector("Collins Group", "Electronic");
+    const companies = service.getCompanyByNameOrSector("Collins Group", "Electronic", null);
     expect(companies.length).toBe(1);
     companies.forEach((company) => {
       expect(company.sector).toBe("Electronic");
       expect(company.name).toBe("Collins Group");
     })
+  });
+
+  it('should test sort companies', () => {
+    const nonSortedCompanies = [
+      {
+        "name": "Torphy, Rosenbaum and Rempel",
+        "sector": "Electronic",
+        "siren": 107855014,
+        "results": [
+            {
+                "ca": 364921,
+                "margin": 61976,
+                "ebitda": 960673,
+                "loss": 2812728,
+                "year": 2017
+            },
+            {
+                "ca": 1944186,
+                "margin": 738525,
+                "ebitda": 846608,
+                "loss": 657145,
+                "year": 2016
+            }
+        ]
+      },
+      {
+        "name": "Morphy, Rosenbaum and Rempel",
+        "sector": "Electronic",
+        "siren": 107855016,
+        "results": [
+            {
+                "ca": 364921,
+                "margin": 61976,
+                "ebitda": 960673,
+                "loss": 2812728,
+                "year": 2017
+            },
+            {
+                "ca": 1944186,
+                "margin": 738525,
+                "ebitda": 846608,
+                "loss": 657145,
+                "year": 2016
+            }
+        ]
+      }
+    ];
+    const sortedCompanies = [
+      {
+        "name": "Morphy, Rosenbaum and Rempel",
+        "sector": "Electronic",
+        "siren": 107855016,
+        "results": [
+            {
+                "ca": 364921,
+                "margin": 61976,
+                "ebitda": 960673,
+                "loss": 2812728,
+                "year": 2017
+            },
+            {
+                "ca": 1944186,
+                "margin": 738525,
+                "ebitda": 846608,
+                "loss": 657145,
+                "year": 2016
+            }
+        ]
+      },
+      {
+        "name": "Torphy, Rosenbaum and Rempel",
+        "sector": "Electronic",
+        "siren": 107855014,
+        "results": [
+            {
+                "ca": 364921,
+                "margin": 61976,
+                "ebitda": 960673,
+                "loss": 2812728,
+                "year": 2017
+            },
+            {
+                "ca": 1944186,
+                "margin": 738525,
+                "ebitda": 846608,
+                "loss": 657145,
+                "year": 2016
+            }
+        ]
+      }
+    ];
+    expect(
+      JSON.stringify(service.sortCompanies(nonSortedCompanies, sort.name))
+    ).toBe(
+      JSON.stringify(sortedCompanies)
+    )
   });
 });

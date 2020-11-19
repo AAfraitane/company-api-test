@@ -1,4 +1,5 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { sort } from './company.controller';
 import { CompanyDto } from './model/company';
 
 const allCompaniesMock = require('../../resources/companies.json');
@@ -11,8 +12,59 @@ export class CompanyService {
         this.allCompanies = allCompaniesMock;
     }
 
-    public getAll(): Array<CompanyDto> {
+    public deleteCompanyBySiren(siren: number): void {
+        const indexToDelete = this.allCompanies.findIndex((comp) => comp.siren === siren);
+        if (indexToDelete > -1) {
+            this.allCompanies.splice(indexToDelete, 1);
+        } else {
+            throw new BadRequestException(`Company with siren ${siren} doesn't exist`);
+        }
+    }
+
+    public createCompany(company: CompanyDto): void {
+        const newCoIndex = this.allCompanies.findIndex((comp) => comp.siren === company.siren);
+        if (newCoIndex > -1) {
+            this.allCompanies[newCoIndex] = company;
+        } else {
+            this.allCompanies.push(company);
+        }
+    }
+
+    public createCompanies(companies: CompanyDto[]): void {
+        this.checkIfCompanyAlreadyExists(companies);
+        this.allCompanies.push(...companies);
+    }
+
+    public checkIfCompanyAlreadyExists(companies: CompanyDto[]) {
+        companies.forEach((newCompany) => {
+            const newCoIndex = this.allCompanies.findIndex((comp) => comp.siren === newCompany.siren);
+            if (newCoIndex > -1) {
+                throw new BadRequestException(`Company with siren ${newCompany.siren} already exist`);
+            }
+        });
+    }
+
+    public getAll(sortBy: sort): Array<CompanyDto> {
+        if (sortBy) {
+            return this.sortCompanies(this.allCompanies, sortBy);
+        }
         return this.allCompanies;
+    }
+
+    public sortCompanies(companies: Array<CompanyDto>, sortBy: sort): Array<CompanyDto> {
+        companies.sort((compA, compB) => {
+            const sortingPropA = compA[sortBy].toLowerCase(),
+                sortingPropB = compB[sortBy].toLowerCase();
+        
+            if (sortingPropA < sortingPropB) {
+                return -1;
+            }
+            if (sortingPropA > sortingPropB) {
+                return 1;
+            }
+            return 0;
+        });
+        return companies;
     }
 
     /**
@@ -34,8 +86,9 @@ export class CompanyService {
      * that is why siren is prefered for unicity)
      * @param name 
      */
-    public getCompanyByNameOrSector(name: string, sector: string): Array<CompanyDto> {
+    public getCompanyByNameOrSector(name: string, sector: string, sortBy: sort): Array<CompanyDto> {
         let companies = this.allCompanies;
+        // Filtering
         if (name) {
             companies = companies.filter((company) => company.name === name);
         }
@@ -44,6 +97,10 @@ export class CompanyService {
         }
         if(companies.length === 0) {
             throw new NotFoundException(`No company match your request`);
+        }
+        // Sorting
+        if (sortBy) {
+            return this.sortCompanies(companies, sortBy);
         }
         return companies;
     }
