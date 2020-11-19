@@ -36,6 +36,6 @@ $ npm run test
 $ npm run test:cov
 ```
 
-You can find a [swagger](localhost:3000/api) in order to interact with the API
+You can find a [swagger](localhost:3000/api) in order to interact with the API at localhost:3000/api
 
 Author - [Afraitane Abdoul-Hakim](https://www.linkedin.com/in/abdoul-hakim-afraitane/)
