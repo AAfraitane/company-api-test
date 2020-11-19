@@ -44,11 +44,19 @@ export class CompanyService {
         });
     }
 
-    public getAll(sortBy: sort): Array<CompanyDto> {
+    public getAll(sortBy: sort, pageSize: number, pageNumber: number): Array<CompanyDto> {
         if (sortBy) {
-            return this.sortCompanies(this.allCompanies, sortBy);
+            return this.paginate(
+                this.sortCompanies(this.allCompanies, sortBy),
+                pageSize,
+                pageNumber,
+            );
         }
-        return this.allCompanies;
+        return this.paginate(
+            this.allCompanies,
+            pageSize,
+            pageNumber,
+        );
     }
 
     public sortCompanies(companies: Array<CompanyDto>, sortBy: sort): Array<CompanyDto> {
@@ -86,7 +94,7 @@ export class CompanyService {
      * that is why siren is prefered for unicity)
      * @param name 
      */
-    public getCompanyByNameOrSector(name: string, sector: string, sortBy: sort): Array<CompanyDto> {
+    public getCompanyByNameOrSector(name: string, sector: string, sortBy: sort, pageSize: number, pageNumber: number): Array<CompanyDto> {
         let companies = this.allCompanies;
         // Filtering
         if (name) {
@@ -102,6 +110,23 @@ export class CompanyService {
         if (sortBy) {
             return this.sortCompanies(companies, sortBy);
         }
-        return companies;
+        return this.paginate(
+            companies,
+            pageSize,
+            pageNumber,
+        );
+    }
+
+    /** This function paginate 
+     * All the param must be not null in oder to process pagination
+     * @param array 
+     * @param pageSize Limit the page size. if this param is greater than array.length ingore pagination
+     * @param pageNumber 
+     */
+    public paginate(array: Array<CompanyDto>, pageSize: number, pageNumber: number) {
+        if (array.length> 0 && pageSize && pageNumber) {
+            return array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+        }
+        return array;
     }
 }
