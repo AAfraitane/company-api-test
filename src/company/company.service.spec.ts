@@ -208,7 +208,7 @@ describe('CompanyService', () => {
           }
       ]
     }
-    service.createCompany(company);
+    service.createOrUpdateCompany(company);
     const createdCompany = service.getCompanyBySiren(company.siren);
     expect(
       JSON.stringify(company)

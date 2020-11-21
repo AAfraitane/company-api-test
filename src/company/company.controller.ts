@@ -76,7 +76,7 @@ export class CompanyController {
         if (siren !== company.siren) {
             throw new BadRequestException("Location must match siren");
         }
-        return this.companyService.createCompany(company);
+        return this.companyService.createOrUpdateCompany(company);
     }
 
     @Post()

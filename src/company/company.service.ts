@@ -21,7 +21,7 @@ export class CompanyService {
         }
     }
 
-    public createCompany(company: CompanyDto): void {
+    public createOrUpdateCompany(company: CompanyDto): void {
         const newCoIndex = this.allCompanies.findIndex((comp) => comp.siren === company.siren);
         if (newCoIndex > -1) {
             this.allCompanies[newCoIndex] = company;
