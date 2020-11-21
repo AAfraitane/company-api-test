@@ -45,21 +45,16 @@ export class CompanyService {
     }
 
     public getAll(sortBy: sort, pageSize: number, pageNumber: number): Array<CompanyDto> {
-        if (sortBy) {
-            return this.paginate(
-                this.sortCompanies(this.allCompanies, sortBy),
-                pageSize,
-                pageNumber,
-            );
-        }
-        return this.paginate(
-            this.allCompanies,
-            pageSize,
-            pageNumber,
-        );
+        let companies = this.allCompanies;
+        companies = this.sortCompaniesIfRequired(companies, sortBy);
+        companies = this.paginateCompaniesIfRequired(companies, pageSize, pageNumber);
+        return companies;
     }
 
-    public sortCompanies(companies: Array<CompanyDto>, sortBy: sort): Array<CompanyDto> {
+    public sortCompaniesIfRequired(companies: Array<CompanyDto>, sortBy: sort): Array<CompanyDto> {
+        if (!sortBy) {
+            return companies;
+        }
         companies.sort((compA, compB) => {
             const sortingPropA = compA[sortBy].toLowerCase(),
                 sortingPropB = compB[sortBy].toLowerCase();
@@ -96,7 +91,13 @@ export class CompanyService {
      */
     public getCompanyByNameOrSector(name: string, sector: string, sortBy: sort, pageSize: number, pageNumber: number): Array<CompanyDto> {
         let companies = this.allCompanies;
-        // Filtering
+        companies = this.filterCompaniesByNameOrSectorIfRequired(companies, name, sector);       
+        companies = this.sortCompaniesIfRequired(companies, sortBy);
+        companies = this.paginateCompaniesIfRequired(companies, pageSize, pageNumber);
+        return companies;
+    }
+
+    public filterCompaniesByNameOrSectorIfRequired(companies: Array<CompanyDto>, name: string, sector: string): Array<CompanyDto> {
         if (name) {
             companies = companies.filter((company) => company.name === name);
         }
@@ -106,27 +107,19 @@ export class CompanyService {
         if(companies.length === 0) {
             throw new NotFoundException(`No company match your request`);
         }
-        // Sorting
-        if (sortBy) {
-            return this.sortCompanies(companies, sortBy);
-        }
-        return this.paginate(
-            companies,
-            pageSize,
-            pageNumber,
-        );
+        return companies;
     }
 
     /** This function paginate 
      * All the param must be not null in oder to process pagination
-     * @param array 
+     * @param companies 
      * @param pageSize Limit the page size. if this param is greater than array.length ingore pagination
      * @param pageNumber 
      */
-    public paginate(array: Array<CompanyDto>, pageSize: number, pageNumber: number) {
-        if (array.length> 0 && pageSize && pageNumber) {
-            return array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+    public paginateCompaniesIfRequired(companies: Array<CompanyDto>, pageSize: number, pageNumber: number) {
+        if (companies.length> 0 && pageSize && pageNumber) {
+            return companies.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
         }
-        return array;
+        return companies;
     }
 }

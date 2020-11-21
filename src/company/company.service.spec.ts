@@ -167,7 +167,7 @@ describe('CompanyService', () => {
       }
     ];
     expect(
-      JSON.stringify(service.sortCompanies(nonSortedCompanies, sort.name))
+      JSON.stringify(service.sortCompaniesIfRequired(nonSortedCompanies, sort.name))
     ).toBe(
       JSON.stringify(sortedCompanies)
     )
@@ -263,7 +263,7 @@ describe('CompanyService', () => {
     const allCompanies = service.getAll(null, null, null);
     const expectedPaginateComp = [{"name":"Hane-Stanton","sector":"Luxury","siren":151419067,"results":[{"ca":1911503,"margin":340643,"ebitda":417233,"loss":5121889,"year":2017},{"ca":3669705,"margin":937608,"ebitda":162576,"loss":8516803,"year":2016}]},{"name":"Gaylord and Sons","sector":"Retail","siren":147007807,"results":[{"ca":2802947,"margin":-192527,"ebitda":895332,"loss":168490,"year":2017},{"ca":1704685,"margin":675635,"ebitda":175060,"loss":8978142,"year":2016}]}];
     expect(
-      JSON.stringify(service.paginate(allCompanies, 2, 2))
+      JSON.stringify(service.paginateCompaniesIfRequired(allCompanies, 2, 2))
     ).toBe(
       JSON.stringify(expectedPaginateComp)
     );
